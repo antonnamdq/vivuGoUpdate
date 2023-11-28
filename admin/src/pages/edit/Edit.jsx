@@ -4,12 +4,15 @@ import Navbar from "../../components/navbar/Navbar";
 import DriveFolderUploadOutlinedIcon from "@mui/icons-material/DriveFolderUploadOutlined";
 import { useState } from "react";
 import axios from "axios";
+import { useLocation, useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
-import { useNavigate } from "react-router-dom";
-const New = ({ inputs, title }) => {
+
+const Edit = ({ inputs, title }) => {
+  const { state } = useLocation();
   const [file, setFile] = useState("");
   const [info, setInfo] = useState({});
   const navigate = useNavigate();
+  const { id } = state;
   const handleChange = (e) => {
     setInfo((prev) => ({ ...prev, [e.target.id]: e.target.value }));
   };
@@ -20,20 +23,20 @@ const New = ({ inputs, title }) => {
     data.append("file", file);
     data.append("upload_preset", "upload");
     try {
-      const uploadRes = await axios.post(
-        "https://api.cloudinary.com/v1_1/diufzggmk/image/upload",
-        data
-      );
-
-      const { url } = uploadRes.data;
-
+      let uploadRes = "";
+      if (Object.keys(data).length) {
+        await axios.post(
+          "https://api.cloudinary.com/v1_1/diufzggmk/image/upload",
+          data
+        );
+      }
+      const { url } = Object.keys(data).length ? uploadRes.data : "";
       const newUser = {
         ...info,
         img: url,
       };
-
-      await axios.post("http://localhost:8800/api/auth/register", newUser);
-      toast.success("Created successfully!");
+      await axios.put(`http://localhost:8800/api/users/${id}`, newUser);
+      toast.success("Edited successfully!");
       navigate("/users");
     } catch (err) {
       console.log(err);
@@ -93,4 +96,4 @@ const New = ({ inputs, title }) => {
   );
 };
 
-export default New;
+export default Edit;

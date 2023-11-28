@@ -1,4 +1,4 @@
-import "./new.scss";
+import "./newRoom.scss";
 import Sidebar from "../../components/sidebar/Sidebar";
 import Navbar from "../../components/navbar/Navbar";
 import DriveFolderUploadOutlinedIcon from "@mui/icons-material/DriveFolderUploadOutlined";
@@ -6,40 +6,58 @@ import { useState } from "react";
 import axios from "axios";
 import { toast } from "react-toastify";
 import { useNavigate } from "react-router-dom";
-const New = ({ inputs, title }) => {
+import Select from "react-select";
+import { useEffect } from "react";
+const NewRoom = ({ inputs, title }) => {
   const [file, setFile] = useState("");
   const [info, setInfo] = useState({});
+  const [selectedOption, setSelectedOption] = useState(null);
+  const [options, setOptions] = useState([]);
   const navigate = useNavigate();
+
+  useEffect(() => {
+    const fetchOptions = async () => {
+      const res = await axios.get("http://localhost:8800/api/hotels/all");
+      const data = res.data.map((item) => {
+        return {
+          value: item._id,
+          label: item.name,
+        };
+      });
+      setOptions(data);
+    };
+    fetchOptions();
+  }, []);
+
   const handleChange = (e) => {
     setInfo((prev) => ({ ...prev, [e.target.id]: e.target.value }));
   };
-
   const handleClick = async (e) => {
     e.preventDefault();
     const data = new FormData();
     data.append("file", file);
     data.append("upload_preset", "upload");
     try {
-      const uploadRes = await axios.post(
-        "https://api.cloudinary.com/v1_1/diufzggmk/image/upload",
-        data
-      );
+      // const uploadRes = await axios.post(
+      //   "https://api.cloudinary.com/v1_1/diufzggmk/image/upload",
+      //   data
+      // );
 
-      const { url } = uploadRes.data;
-
-      const newUser = {
+      const newRooms = {
         ...info,
-        img: url,
+        // photos: url,
       };
 
-      await axios.post("http://localhost:8800/api/auth/register", newUser);
+      await axios.post(
+        `http://localhost:8800/api/rooms/${selectedOption.value}`,
+        newRooms
+      );
       toast.success("Created successfully!");
-      navigate("/users");
+      navigate("/rooms");
     } catch (err) {
       console.log(err);
     }
   };
-
   return (
     <div className="new">
       <Sidebar />
@@ -84,6 +102,12 @@ const New = ({ inputs, title }) => {
                   />
                 </div>
               ))}
+              <Select
+                defaultValue={selectedOption}
+                onChange={setSelectedOption}
+                options={options}
+                className="select"
+              />
               <button onClick={handleClick}>Send</button>
             </form>
           </div>
@@ -93,4 +117,4 @@ const New = ({ inputs, title }) => {
   );
 };
 
-export default New;
+export default NewRoom;

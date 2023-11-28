@@ -27,11 +27,10 @@ const Hotel = () => {
   const { data, loading, error } = useFetch(`/api/hotels/find/${id}`);
   const { user } = useContext(AuthContext);
   const navigate = useNavigate();
-
   const { dates, options } = useContext(SearchContext);
 
   const MILLISECONDS_PER_DAY = 1000 * 60 * 60 * 24;
-  const dayDifference = (date1, date2)=>{
+  const dayDifference = (date1, date2) => {
     const timeDiff = Math.abs(Date.parse(date2) - Date.parse(date1));
     const diffDays = Math.ceil(timeDiff / MILLISECONDS_PER_DAY);
     return diffDays;
@@ -128,6 +127,20 @@ const Hotel = () => {
               <div className="hotelDetailsTexts">
                 <h1 className="hotelTitle">{data.title}</h1>
                 <p className="hotelDesc">{data.desc}</p>
+                <div>
+                  {data.photos.map((item) => {
+                    return (
+                      <div className="hotelImgWrapper">
+                        <img
+                          src={item}
+                          key={item}
+                          alt="anh"
+                          className="hotelImg"
+                        />
+                      </div>
+                    );
+                  })}
+                </div>
               </div>
               <div className="hotelDetailsPrice">
                 <h1>Perfect for a {days}-night stay!</h1>
@@ -147,7 +160,7 @@ const Hotel = () => {
           <Footer />
         </div>
       )}
-      {openModal && <Reserve setOpen={setOpenModal} hotelId={id}/>}
+      {openModal && <Reserve setOpen={setOpenModal} hotelId={id} />}
     </div>
   );
 };

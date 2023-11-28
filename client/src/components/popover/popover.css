@@ -1,0 +1,10 @@
+.wrapper {
+  display: flex;
+  cursor: pointer;
+  align-items: center;
+}
+.wrapper_render_popover {
+  position: absolute;
+  z-index: 10;
+  transform: translateY(-95%);
+}

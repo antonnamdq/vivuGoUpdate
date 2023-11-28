@@ -13,31 +13,35 @@ const Login = () => {
 
   const { loading, error, dispatch } = useContext(AuthContext);
 
-  const navigate = useNavigate()
+  const navigate = useNavigate();
 
   const handleChange = (e) => {
     serCredentials((prev) => ({ ...prev, [e.target.id]: e.target.value }));
   };
 
-  const handleClick = async e=>{
-    e.preventDefault()
-    dispatch({type:"LOGIN_START"})
-    try{
-        const res = await axios.post("/api/auth/login", credentials)
-        if (res.data.isAdmin) {
-          dispatch({ type: "LOGIN_SUCCESS", payload: res.data.details });
-  
-          navigate("/");
-        } else {
-          dispatch({
-            type: "LOGIN_FAILURE",
-            payload: { message: "You are not allowed!" },
-          });
-        }
-      } catch (err) {
-        dispatch({ type: "LOGIN_FAILURE", payload: err.response.data });
+  const handleClick = async (e) => {
+    e.preventDefault();
+    dispatch({ type: "LOGIN_START" });
+    try {
+      const res = await axios.post(
+        "http://localhost:8800/api/auth/login",
+        credentials
+      );
+      if (res.data.isAdmin) {
+        console.log(res.data.details);
+        dispatch({ type: "LOGIN_SUCCESS", payload: res.data.details });
+
+        navigate("/");
+      } else {
+        dispatch({
+          type: "LOGIN_FAILURE",
+          payload: { message: "You are not allowed!" },
+        });
       }
-    };
+    } catch (err) {
+      dispatch({ type: "LOGIN_FAILURE", payload: err.response.data });
+    }
+  };
 
   return (
     <div className="login">
@@ -56,7 +60,9 @@ const Login = () => {
           onChange={handleChange}
           className="lInput"
         ></input>
-        <button onClick={handleClick} className="lButton">Login</button>
+        <button onClick={handleClick} className="lButton">
+          Login
+        </button>
         {error && <span>{error.message}</span>}
       </div>
     </div>

@@ -8,7 +8,6 @@ export const register = async (req, res, next) => {
     const salt = bcrypt.genSaltSync(10);
     const hash = bcrypt.hashSync(req.body.password, salt);
 
-    console.log(req.body,'body')
     const newUser = new User({
       ...req.body,
       password: hash,
@@ -17,7 +16,7 @@ export const register = async (req, res, next) => {
     await newUser.save();
     res.status(200).send("User has been created");
   } catch (err) {
-    console.log(err)
+    console.log(err);
     next(err);
   }
 };
@@ -45,7 +44,7 @@ export const login = async (req, res, next) => {
         httpOnly: true,
       })
       .status(200)
-      .json({ details: {...otherDetails}, isAdmin });
+      .json({ details: { ...otherDetails }, isAdmin });
   } catch (err) {
     next(err);
   }
